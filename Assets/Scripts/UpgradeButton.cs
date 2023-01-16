@@ -27,21 +27,21 @@ public class UpgradeButton : MonoBehaviour
     // Awake가 Start보다 조금 더 빠르다.
     void Start()
     {
-        DataController.GetInstance().LoadUpgradeButton(this);
+        DataController.Instance.LoadUpgradeButton(this);
         UpdateUI();
     }
 
     public void PurchaseUpgrade()
     {
-        if (DataController.GetInstance().GetGold() >= currentCost)
+        if (DataController.Instance.gold >= currentCost)
         {
-            DataController.GetInstance().SubGold(currentCost);
+            DataController.Instance.gold -= currentCost;
             level++;
-            DataController.GetInstance().AddGoldPerClick(goldByUpgrade);
+            DataController.Instance.goldPerClick += goldByUpgrade;
 
             UpdateUpgrade();
             UpdateUI();
-            DataController.GetInstance().SaveUpgradeButton(this);
+            DataController.Instance.SaveUpgradeButton(this);
         }
     }
 
@@ -53,6 +53,7 @@ public class UpgradeButton : MonoBehaviour
 
     public void UpdateUI()
     {
-        upgradeDisplayer.text = upgradeName + "\nCost: " + currentCost + "\nLevel: " + level + "\nNext New GoldPerClick: " + goldByUpgrade;
+        upgradeDisplayer.text = upgradeName + "\nCost: " + currentCost + 
+            "\nLevel: " + level + "\nNext New GoldPerClick: " + goldByUpgrade;
     }
 }

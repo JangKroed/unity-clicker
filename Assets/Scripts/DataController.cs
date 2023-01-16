@@ -7,73 +7,66 @@ public class DataController : MonoBehaviour
 {
     private static DataController instance;
 
-    public static DataController GetInstance()
+    public static DataController Instance
     {
-        if (instance == null)
+        get
         {
-            instance = FindObjectOfType<DataController>();
-
-            if (instance == null )
+            if (instance == null)
             {
-                GameObject container = new GameObject("DataController");
+                instance = FindObjectOfType<DataController>();
 
-                instance = container.AddComponent<DataController>();
+                if (instance == null )
+                {
+                    GameObject container = new("DataController");
+
+                    instance = container.AddComponent<DataController>();
+                }
             }
+            return instance;
         }
-        return instance;
     }
 
-    private ItemButton[] itemButtons;
+    private HeroButton[] HeroButtons;
 
-    private int m_gold = 0;
-    private int m_goldPerClick = 0;
+    public long gold
+    {
+        get
+        {
+            if (!PlayerPrefs.HasKey("Gold"))
+            {
+                return 0;
+            }
+
+            string tmpGold = PlayerPrefs.GetString("Gold");
+            return long.Parse(tmpGold);
+        }
+        set
+        {
+            PlayerPrefs.SetString("Gold", value.ToString());
+        }
+    }
+    public long goldPerClick
+    {
+        get
+        {
+            if (!PlayerPrefs.HasKey("GoldPerClick"))
+            {
+                return 1;
+            }
+            string tmpGoldPerClick = PlayerPrefs.GetString("GoldPerClick");
+            return long.Parse(tmpGoldPerClick);
+        }
+        set
+        {
+            PlayerPrefs.SetString("GoldPerClick", value.ToString());
+        }
+    }
 
     void Awake()
     {
-        // KEY : VALUE = localStorage 같은 느낌
-        m_gold = PlayerPrefs.GetInt("Gold");
-        m_goldPerClick = PlayerPrefs.GetInt("GoldPerClick", 1);
-
-        itemButtons = FindObjectsOfType<ItemButton>();
-    }
-
-    public void SetGold(int newGold)
-    {
-        m_gold = newGold;
-        PlayerPrefs.SetInt("Gold", m_gold);
-    }
-
-    public void AddGold(int newGold)
-    {
-        m_gold += newGold;
-        SetGold(m_gold);
-    }
-
-    public void SubGold(int newGold)
-    {
-        m_gold -= newGold;
-        SetGold(m_gold);
-    }
-
-    public int GetGold()
-    {
-        return m_gold;
-    }
-    public int GetGoldPerClick()
-    {
-        return m_goldPerClick;
-    }
-
-    public void SetGoldPerClick(int newGoldPerClick)
-    {
-        m_goldPerClick = newGoldPerClick;
-        PlayerPrefs.SetInt("GoldPerClick", m_goldPerClick);
-    }
-
-    public void AddGoldPerClick(int newGoldPerClick)
-    {
-        m_goldPerClick += newGoldPerClick;
-        SetGoldPerClick(m_goldPerClick);
+        // 플레이어 저장정보 삭제
+        // PlayerPrefs.DeleteAll();
+        HeroButtons = FindObjectsOfType<HeroButton>();
     }
 
     public void LoadUpgradeButton(UpgradeButton upgradeButton)
@@ -95,33 +88,33 @@ public class DataController : MonoBehaviour
         PlayerPrefs.SetInt(key + "_cost", upgradeButton.currentCost);
     }
 
-    public void LoadItemButton(ItemButton itemButton)
+    public void LoadHeroButton(HeroButton HeroButton)
     {
-        string key = itemButton.itemName;
+        string key = HeroButton.itemName;
 
-        itemButton.level = PlayerPrefs.GetInt(key + "_level");
-        itemButton.currentCost = PlayerPrefs.GetInt(key + "_cost", itemButton.startCurrentCost) ;
-        itemButton.goldPerSec = PlayerPrefs.GetInt(key + "_goldPerSec");
+        HeroButton.level = PlayerPrefs.GetInt(key + "_level");
+        HeroButton.currentCost = PlayerPrefs.GetInt(key + "_cost", HeroButton.startCurrentCost) ;
+        HeroButton.goldPerSec = PlayerPrefs.GetInt(key + "_goldPerSec");
 
         if (PlayerPrefs.GetInt(key + "_isPurchased") == 1)
         {
-            itemButton.isPurchased = true;
+            HeroButton.isPurchased = true;
         }
         else
         {
-            itemButton.isPurchased= false;
+            HeroButton.isPurchased= false;
         }
     }
     
-    public void SaveItemButton(ItemButton itemButton)
+    public void SaveHeroButton(HeroButton HeroButton)
     {
-        string key = itemButton.itemName;
+        string key = HeroButton.itemName;
 
-        PlayerPrefs.SetInt(key + "_level", itemButton.level);
-        PlayerPrefs.SetInt(key + "_cost", itemButton.currentCost);
-        PlayerPrefs.SetInt(key + "_goldPerSec", itemButton.goldPerSec);
+        PlayerPrefs.SetInt(key + "_level", HeroButton.level);
+        PlayerPrefs.SetInt(key + "_cost", HeroButton.currentCost);
+        PlayerPrefs.SetInt(key + "_goldPerSec", HeroButton.goldPerSec);
 
-        if (itemButton.isPurchased == true)
+        if (HeroButton.isPurchased == true)
         {
             PlayerPrefs.SetInt(key + "_isPurchased", 1);
         }
@@ -134,9 +127,9 @@ public class DataController : MonoBehaviour
     public int GetGoldPerSec()
     {
         int goldPerSec = 0;
-        for (int i = 0; i < itemButtons.Length; i++)
+        for (int i = 0; i < HeroButtons.Length; i++)
         {
-            goldPerSec += itemButtons[i].goldPerSec;
+            goldPerSec += HeroButtons[i].goldPerSec;
         }
         return goldPerSec;
     }
